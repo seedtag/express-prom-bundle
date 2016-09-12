@@ -78,24 +78,24 @@ function main(opts) {
             );
             return metric;
         },
-        "cpu": () => factory.newGauge(
-            "cpu", 
+        "nodejs_cpu": () => factory.newGauge(
+            "nodejs_cpu", 
             "cpu usage"
         ),
-        "memory": () => factory.newGauge(
-            "memory", 
+        "nodejs_memory": () => factory.newGauge(
+            "nodejs_memory", 
             "memory usage"
         ),
-        "load1": () => factory.newGauge(
-            "load1", 
+        "nodejs_load1": () => factory.newGauge(
+            "nodejs_load1", 
             "average 1-minute load"
         ),
-        "load5": () => factory.newGauge(
-            "load5", 
+        "nodejs_load5": () => factory.newGauge(
+            "nodejs_load5", 
             "average 5-minutes load"
         ),
-        "load15": () => factory.newGauge(
-            "load15", 
+        "nodejs_load15": () => factory.newGauge(
+            "nodejs_load15", 
             "average 15-minutes load"
         ),
     };
@@ -122,35 +122,35 @@ function main(opts) {
             if (metrics["nodejs_memory_heap_used_bytes"]) {
                 metrics["nodejs_memory_heap_used_bytes"].set(memoryUsage.heapUsed);
             }
-            if (metrics["cpu"] || metrics["memory"]) {
+            if (metrics["nodejs_cpu"] || metrics["nodejs_memory"]) {
                 pidusage.stat(process.pid, (err, stat) => {
                     if (err) {
                         console.error(err);
                     } else {
                         console.log(stat);
-                        if (metrics["cpu"]) {
-                            metrics["cpu"].set(stat.cpu);
+                        if (metrics["nodejs_cpu"]) {
+                            metrics["nodejs_cpu"].set(stat.cpu);
                         }
-                        if (metrics["memory"]) {
-                            metrics["memory"].set(stat.memory / 1024 / 1024);
+                        if (metrics["nodejs_memory"]) {
+                            metrics["nodejs_memory"].set(stat.memory / 1024 / 1024);
                         }
                     }
                 });
                 pidusage.unmonitor(process.pid);
             }
-            if (metrics["load1"] || metrics["load5"] || metrics["load15"]) {
+            if (metrics["nodejs_load1"] || metrics["nodejs_load5"] || metrics["nodejs_load15"]) {
                 const load = os.loadavg();
                 const load1 = load[0];
                 const load5 = load[1];
                 const load15 = load[2];
-                if (metrics["load1"]) {
-                    metrics["load1"].set(load1);
+                if (metrics["nodejs_load1"]) {
+                    metrics["nodejs_load1"].set(load1);
                 }
-                if (metrics["load5"]) {
-                    metrics["load5"].set(load5);
+                if (metrics["nodejs_load5"]) {
+                    metrics["nodejs_load5"].set(load5);
                 }
-                if (metrics["load15"]) {
-                    metrics["load15"].set(load15);
+                if (metrics["nodejs_load15"]) {
+                    metrics["nodejs_load15"].set(load15);
                 }
             }
             res.contentType("text/plain")
