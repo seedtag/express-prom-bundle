@@ -2,7 +2,9 @@
 
 const
     PromFactory = require("./PromFactory"),
-    onFinished = require("on-finished");
+    onFinished = require("on-finished"),
+    pidusage = require('pidusage'),
+    os = require("os");
 
 function matchVsRegExps(element, regexps) {
     for (let regexp of regexps) {
@@ -75,7 +77,27 @@ function main(opts) {
                 }
             );
             return metric;
-        }
+        },
+        "cpu": () => factory.newGauge(
+            "cpu", 
+            "cpu usage"
+        ),
+        "memory": () => factory.newGauge(
+            "memory", 
+            "memory usage"
+        ),
+        "load1": () => factory.newGauge(
+            "load1", 
+            "average 1-minute load"
+        ),
+        "load5": () => factory.newGauge(
+            "load5", 
+            "average 5-minutes load"
+        ),
+        "load15": () => factory.newGauge(
+            "load15", 
+            "average 15-minutes load"
+        ),
     };
 
     const
@@ -100,7 +122,37 @@ function main(opts) {
             if (metrics["nodejs_memory_heap_used_bytes"]) {
                 metrics["nodejs_memory_heap_used_bytes"].set(memoryUsage.heapUsed);
             }
-
+            if (metrics["cpu"] || metrics["memory"]) {
+                pidusage.stat(process.pid, (err, stat) => {
+                    if (err) {
+                        console.error(err);
+                    } else {
+                        console.log(stat);
+                        if (metrics["cpu"]) {
+                            metrics["cpu"].set(stat.cpu);
+                        }
+                        if (metrics["memory"]) {
+                            metrics["memory"].set(stat.memory / 1024 / 1024);
+                        }
+                    }
+                });
+                pidusage.unmonitor(process.pid);
+            }
+            if (metrics["load1"] || metrics["load5"] || metrics["load15"]) {
+                const load = os.loadavg();
+                const load1 = load[0];
+                const load5 = load[1];
+                const load15 = load[2];
+                if (metrics["load1"]) {
+                    metrics["load1"].set(load1);
+                }
+                if (metrics["load5"]) {
+                    metrics["load5"].set(load5);
+                }
+                if (metrics["load15"]) {
+                    metrics["load15"].set(load15);
+                }
+            }
             res.contentType("text/plain")
                 .send(factory.promClient.register.metrics());
             return;

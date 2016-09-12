@@ -16,7 +16,8 @@
   "license": "MIT",
   "dependencies": {
     "on-finished": "^2.3.0",
-    "prom-client": "^3.4.6"
+    "prom-client": "^3.4.6",
+    "pidusage": "^1.0.4"
   },
   "devDependencies": {
     "coveralls": "^2.11.12",
