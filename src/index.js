@@ -136,7 +136,7 @@ function main(opts) {
                         }
                     }
                 });
-                pidusage.unmonitor(process.pid);
+                // pidusage.unmonitor(process.pid);
             }
             if (metrics["nodejs_load1"] || metrics["nodejs_load5"] || metrics["nodejs_load15"]) {
                 const load = os.loadavg();
