@@ -79,23 +79,23 @@ function main(opts) {
             return metric;
         },
         "nodejs_cpu": () => factory.newGauge(
-            "nodejs_cpu", 
+            "nodejs_cpu",
             "cpu usage"
         ),
         "nodejs_memory": () => factory.newGauge(
-            "nodejs_memory", 
+            "nodejs_memory",
             "memory usage"
         ),
         "nodejs_load1": () => factory.newGauge(
-            "nodejs_load1", 
+            "nodejs_load1",
             "average 1-minute load"
         ),
         "nodejs_load5": () => factory.newGauge(
-            "nodejs_load5", 
+            "nodejs_load5",
             "average 5-minutes load"
         ),
         "nodejs_load15": () => factory.newGauge(
-            "nodejs_load15", 
+            "nodejs_load15",
             "average 15-minutes load"
         ),
     };
@@ -128,7 +128,7 @@ function main(opts) {
                     if (err) {
                         console.error(err);
                     } else {
-                        console.log(stat);
+                        // console.log(stat);
                         if (metrics["nodejs_cpu"]) {
                             metrics["nodejs_cpu"].set(stat.cpu);
                         }
