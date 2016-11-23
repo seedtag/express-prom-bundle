@@ -102,6 +102,7 @@ function main(opts) {
 
     const
         metrics = {},
+        dynmetrics = [],
         names = prepareMetricNames(opts, metricTemplates);
 
 
@@ -153,6 +154,9 @@ function main(opts) {
                     metrics["nodejs_load15"].set(load15);
                 }
             }
+            dynmetrics.forEach(([gauge, updater]) => {
+              gauge.set(updater());
+            });
             res.contentType("text/plain")
                 .send(factory.promClient.register.metrics());
             return;
@@ -175,10 +179,15 @@ function main(opts) {
         next();
     };
 
+    function addMetric(name, description, f) {
+      dynmetrics.push([factory.newGauge(name, description), f]);
+    }
+
     middleware.factory = factory;
     middleware.metricTemplates = metricTemplates;
     middleware.metrics = metrics;
     middleware.promClient = factory.promClient;
+    middleware.addMetric = addMetric;
 
     return middleware;
 }
