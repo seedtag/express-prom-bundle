@@ -2,8 +2,8 @@
 const onFinished = require('on-finished');
 const promClient = require('prom-client');
 const normalizePath = require('./normalizePath');
-const pidusage = require('pidusage');
 const os = require('os');
+const usage = new (require('./usage'))();
 
 function matchVsRegExps(element, regexps) {
   for (let regexp of regexps) {
@@ -149,20 +149,13 @@ function main(opts) {
       });
     }
     if (metrics['nodejs_cpu'] || metrics['nodejs_memory']) {
-      pidusage.stat(process.pid, (err, stat) => {
-        if (err) {
-          console.error(err);
-        } else {
-          // console.log(stat);
-          if (metrics['nodejs_cpu']) {
-            metrics['nodejs_cpu'].set(stat.cpu);
-          }
-          if (metrics['nodejs_memory']) {
-            metrics['nodejs_memory'].set(stat.memory / 1024 / 1024);
-          }
-        }
-      });
-      // pidusage.unmonitor(process.pid);
+      const usageValue = usage.get;
+      if (metrics['nodejs_cpu']) {
+        metrics['nodejs_cpu'].set(usageValue.cpu);
+      }
+      if (metrics['nodejs_memory']) {
+        metrics['nodejs_memory'].set(usageValue.memory / 1024 / 1024);
+      }
     }
     if (metrics['nodejs_load1'] || metrics['nodejs_load5'] || metrics['nodejs_load15']) {
       const load = os.loadavg();
